@@ -2,6 +2,6 @@ export interface JobOffer {
   id: number;
   entreprise: string;
   poste: string;
-  statut: string;
+  status: string;
   date: string;
 }
