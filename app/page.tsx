@@ -3,6 +3,7 @@
 import { JobOffer } from "./lib/types";
 import { JobOfferCard } from "./components/JobOfferCard";
 import { useCallback, useState } from "react";
+import { AddJobOfferForm } from "./components/AddJobOfferForm";
 
 export default function Home() {
   const mockJobsOffer: JobOffer[] = [
@@ -50,10 +51,14 @@ export default function Home() {
     []
   );
 
+  const addJobOffer = useCallback((jobOffer: JobOffer) => {
+    setJobsOffer((prev) => [...prev, jobOffer]);
+  }, []);
+
   return (
     <div>
-      <h1>Job Tracker</h1>
-      <div className="flex space-x-3">
+      <h1 className="text-brand text-3xl uppercase font-bold">Job Tracker</h1>
+      <div className="flex space-x-3 bg-bg-secondary">
         {jobsOffer.map((jobOffer) => (
           <JobOfferCard
             key={jobOffer.id}
@@ -63,6 +68,7 @@ export default function Home() {
           />
         ))}
       </div>
+      <AddJobOfferForm addJobOffer={addJobOffer} />
     </div>
   );
 }
