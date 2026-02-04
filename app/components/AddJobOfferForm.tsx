@@ -5,6 +5,7 @@ import { JobOffer } from "../lib/types";
 
 interface AddJobOfferProps {
   addJobOffer: (jobOffer: JobOffer) => void;
+  closeModal: () => void;
 }
 
 interface AddJobFormState {
@@ -12,20 +13,21 @@ interface AddJobFormState {
   poste: string;
   status: string;
   date: string;
-  errors: string;
 }
 
 type AddJobFormAction =
   | { type: "SET_FIELDS"; field: keyof AddJobFormState; value: string }
   | { type: "RESET" };
 
-export const AddJobOfferForm = ({ addJobOffer }: AddJobOfferProps) => {
+export const AddJobOfferForm = ({
+  addJobOffer,
+  closeModal,
+}: AddJobOfferProps) => {
   const initialAddJobForm = {
     entreprise: "",
     poste: "",
-    status: "",
+    status: "Envoyé",
     date: "",
-    errors: "",
   };
 
   const addJobReducer = (state: AddJobFormState, action: AddJobFormAction) => {
@@ -42,19 +44,19 @@ export const AddJobOfferForm = ({ addJobOffer }: AddJobOfferProps) => {
 
   const handleAddJob = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!state.entreprise) {
-      //dispatch seterror
-      return;
-    }
     addJobOffer({ id: Date.now(), ...state });
+    closeModal();
     dispatch({ type: "RESET" });
   };
 
   return (
     <div className="absolute flex items-center justify-center inset-0">
       <div className="bg-bgPrimary text-textPrimary ">
+        <button onClick={closeModal}>Close</button>
         <form className="flex flex-col border" onSubmit={handleAddJob}>
+          <label>Entreprise</label>
           <input
+            required
             type="text"
             value={state.entreprise}
             onChange={(e) =>
@@ -65,7 +67,9 @@ export const AddJobOfferForm = ({ addJobOffer }: AddJobOfferProps) => {
               })
             }
           />
+          <label>Poste</label>
           <input
+            required
             type="text"
             value={state.poste}
             onChange={(e) =>
@@ -76,9 +80,9 @@ export const AddJobOfferForm = ({ addJobOffer }: AddJobOfferProps) => {
               })
             }
           />
-          <input
-            type="text"
-            value={state.status}
+          <label>Status</label>
+          <select
+            defaultValue={state.status}
             onChange={(e) =>
               dispatch({
                 type: "SET_FIELDS",
@@ -86,9 +90,15 @@ export const AddJobOfferForm = ({ addJobOffer }: AddJobOfferProps) => {
                 value: e.target.value,
               })
             }
-          />
+          >
+            <option value="Envoyé">Envoyé</option>
+            <option value="Entretien">Entretien</option>
+            <option value="Refus">Refus</option>
+          </select>
+          <label>Date</label>
           <input
-            type="text"
+            required
+            type="date"
             value={state.date}
             onChange={(e) =>
               dispatch({

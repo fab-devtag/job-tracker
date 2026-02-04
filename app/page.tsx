@@ -1,9 +1,12 @@
 "use client";
 
+//
+
 import { JobOffer } from "./lib/types";
 import { JobOfferCard } from "./components/JobOfferCard";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AddJobOfferForm } from "./components/AddJobOfferForm";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 export default function Home() {
   const mockJobsOffer: JobOffer[] = [
@@ -30,12 +33,23 @@ export default function Home() {
     },
   ];
 
-  const [jobsOffer, setJobsOffer] = useState<JobOffer[]>(mockJobsOffer);
+  const { value, saveValue } = useLocalStorage<JobOffer[]>(
+    "jobsOffer",
+    mockJobsOffer,
+  );
+  const [jobsOffer, setJobsOffer] = useState<JobOffer[]>([]);
+  const [showAddJobModal, setShowAddJobModal] = useState(false);
+
+  useEffect(() => {
+    setJobsOffer(value);
+  }, [value]);
 
   const removeJobOffer = useCallback((jobOfferId: number) => {
-    setJobsOffer((prev) =>
-      prev.filter((jobOffer) => jobOffer.id !== jobOfferId)
-    );
+    setJobsOffer((prev) => {
+      const newValue = prev.filter((jobOffer) => jobOffer.id !== jobOfferId);
+      saveValue(newValue);
+      return newValue;
+    });
   }, []);
 
   const changeJobOfferStatus = useCallback(
@@ -44,15 +58,19 @@ export default function Home() {
         prev.map((jobsOffer) =>
           jobsOffer.id === jobOfferId
             ? { ...jobsOffer, status: status }
-            : jobsOffer
-        )
+            : jobsOffer,
+        ),
       );
     },
-    []
+    [],
   );
 
   const addJobOffer = useCallback((jobOffer: JobOffer) => {
-    setJobsOffer((prev) => [...prev, jobOffer]);
+    setJobsOffer((prev) => {
+      const newValue = [...prev, jobOffer];
+      saveValue(newValue);
+      return newValue;
+    });
   }, []);
 
   return (
@@ -68,7 +86,13 @@ export default function Home() {
           />
         ))}
       </div>
-      <AddJobOfferForm addJobOffer={addJobOffer} />
+      {showAddJobModal && (
+        <AddJobOfferForm
+          addJobOffer={addJobOffer}
+          closeModal={() => setShowAddJobModal(false)}
+        />
+      )}
+      <button onClick={() => setShowAddJobModal(true)}>Ajouter un job</button>
     </div>
   );
 }
