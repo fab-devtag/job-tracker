@@ -1,12 +1,12 @@
 "use client";
 
-//
-
 import { JobOffer } from "./lib/types";
 import { JobOfferCard } from "./components/JobOfferCard";
 import { useCallback, useEffect, useState } from "react";
 import { AddJobOfferForm } from "./components/AddJobOfferForm";
 import { useLocalStorage } from "./hooks/useLocalStorage";
+
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const mockJobsOffer: JobOffer[] = [
@@ -92,7 +92,8 @@ export default function Home() {
           closeModal={() => setShowAddJobModal(false)}
         />
       )}
-      <button onClick={() => setShowAddJobModal(true)}>Ajouter un job</button>
+
+      <Button onClick={() => setShowAddJobModal(true)}>Ajouter un job</Button>
     </div>
   );
 }
