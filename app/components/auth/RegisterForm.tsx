@@ -3,25 +3,23 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema } from "@/lib/validations/auth";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { signupAction } from "@/app/actions/signup";
+import { Button } from "../ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "../ui/card";
+import { FieldGroup, Field, FieldLabel, FieldError } from "../ui/field";
+import { Input } from "../ui/input";
 
 export const RegisterForm = () => {
-  const { handleSubmit, control } = useForm<z.infer<typeof signupSchema>>({
+  const { handleSubmit, control, reset } = useForm<
+    z.infer<typeof signupSchema>
+  >({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       email: "",
@@ -29,6 +27,16 @@ export const RegisterForm = () => {
       password: "",
     },
   });
+  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+    try {
+      const result = await signupAction(data); // Appel serveur sécurisé
+      console.log("Utilisateur créé :", result);
+      reset();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Card className="w-1/4">
       <CardHeader>
@@ -38,10 +46,7 @@ export const RegisterForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          id="register-form"
-          onSubmit={handleSubmit((data) => console.log(data))}
-        >
+        <form id="register-form" onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="email"

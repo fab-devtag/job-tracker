@@ -5,9 +5,7 @@ import { JobOfferCard } from "./components/JobOfferCard";
 import { useCallback, useEffect, useState } from "react";
 import { AddJobOfferForm } from "./components/AddJobOfferForm";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-
-import { Button } from "@/components/ui/button";
-import { signup } from "./actions/signup";
+import { Button } from "./components/ui/button";
 
 export default function Home() {
   const mockJobsOffer: JobOffer[] = [
@@ -95,7 +93,6 @@ export default function Home() {
       )}
 
       <Button onClick={() => setShowAddJobModal(true)}>Ajouter un job</Button>
-      <Button onClick={() => signup("unmotdepass")}>Test server actions</Button>
     </div>
   );
 }
