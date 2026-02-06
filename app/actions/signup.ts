@@ -14,6 +14,18 @@ export const signupAction = async (data: z.infer<typeof signupSchema>) => {
     };
   }
 
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+
+  if (existingUser) {
+    return {
+      errors: "Un utilisateur avec cet email existe déjà",
+    };
+  }
+
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
   return await prisma.user.create({

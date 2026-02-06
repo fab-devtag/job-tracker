@@ -29,7 +29,7 @@ export const RegisterForm = () => {
   });
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
     try {
-      const result = await signupAction(data); // Appel serveur sécurisé
+      const result = await signupAction(data);
       console.log("Utilisateur créé :", result);
       reset();
     } catch (error) {
