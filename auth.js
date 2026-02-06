@@ -8,7 +8,7 @@ export const { auth, handlers, signIn, signOut, } = NextAuth({
                 email: { label: 'Email' },
                 password: { label: 'Password', type: 'password' }
             },
-            async authorize(credentials) {
+            async authorize() {
                 return null;
             }
         })
