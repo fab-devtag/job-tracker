@@ -7,10 +7,10 @@ import z from "zod";
 
 export const signupAction = async (data: z.infer<typeof signupSchema>) => {
   const validatedFields = signupSchema.safeParse(data);
-
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.message,
+      success: false,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
     };
   }
 
@@ -22,17 +22,34 @@ export const signupAction = async (data: z.infer<typeof signupSchema>) => {
 
   if (existingUser) {
     return {
-      errors: "Un utilisateur avec cet email existe déjà",
+      success: false,
+      error: "Un utilisateur avec cet email existe déjà",
     };
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
-  return await prisma.user.create({
-    data: {
-      email: data.email,
-      name: data.name,
-      hashedPassword: hashedPassword,
-    },
-  });
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+        hashedPassword: hashedPassword,
+      },
+    });
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Erreur lors de la création du compte",
+    };
+  }
 };

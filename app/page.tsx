@@ -1,11 +1,13 @@
 "use client";
 
 import { JobOffer } from "./lib/types";
-import { JobOfferCard } from "./components/JobOfferCard";
+
 import { useCallback, useEffect, useState } from "react";
-import { AddJobOfferForm } from "./components/AddJobOfferForm";
+
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { Button } from "./components/ui/button";
+import { AddJobOfferForm } from "@/components/AddJobOfferForm";
+import { JobOfferCard } from "@/components/JobOfferCard";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const mockJobsOffer: JobOffer[] = [
