@@ -1,10 +1,5 @@
 "use client";
-import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signupSchema } from "@/lib/validations/auth";
-import { signupAction } from "@/actions/signup";
-import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -13,55 +8,58 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Button } from "../ui/button";
-import { FieldGroup, Field, FieldLabel, FieldError } from "../ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import * as z from "zod";
+import { loginSchema } from "@/lib/validations/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { Spinner } from "../ui/spinner";
+import { useRouter } from "next/navigation";
 
-export const RegisterForm = () => {
+export const LoginForm = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { handleSubmit, control, reset } = useForm<
-    z.infer<typeof signupSchema>
-  >({
-    resolver: zodResolver(signupSchema),
+  const { control, handleSubmit } = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     mode: "onBlur",
     defaultValues: {
       email: "",
-      name: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     setServerError(null);
 
-    const result = await signupAction(data);
+    const result = await signIn("credentials", { ...data, redirect: false });
 
     setIsLoading(false);
 
-    if (!result.success) {
-      setServerError(result.error || "Erreur lors de l'inscription");
-      console.error("Erreurs : ", result.errors || result.error);
+    if (result.error) {
+      setServerError("Les identitifants sont incorrectes");
+      console.error("Erreurs :", result.error);
       return;
+    } else {
+      console.log("La connexion est un succès");
+      router.push("/");
     }
-
-    console.log("Utilisateur créé :", result);
-    reset();
   };
-
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Formulaire d'inscription</CardTitle>
+        <CardTitle>Formulaire de connexion</CardTitle>
         <CardDescription>
-          Saisissez vos informations pour vous inscrire
+          Saissisez vos informations de connexion
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="register-form" onSubmit={handleSubmit(onSubmit)}>
+        <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             {serverError && (
               <div className="text-sm text-red-500">{serverError}</div>
@@ -76,34 +74,15 @@ export const RegisterForm = () => {
                     {...field}
                     id="email"
                     type="email"
+                    aria-invalid={fieldState.invalid}
                     placeholder="email@example.com"
-                    aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="name">Nom</FieldLabel>
-                  <Input
-                    {...field}
-                    id="name"
-                    type="text"
-                    placeholder="Fabien"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+            ></Controller>
             <Controller
               name="password"
               control={control}
@@ -114,27 +93,27 @@ export const RegisterForm = () => {
                     {...field}
                     id="password"
                     type="password"
-                    placeholder="********"
                     aria-invalid={fieldState.invalid}
+                    placeholder="********"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
-            />
+            ></Controller>
           </FieldGroup>
         </form>
       </CardContent>
       <CardFooter>
-        <Button type="submit" form="register-form" disabled={isLoading}>
+        <Button form="login-form" type="submit" disabled={isLoading}>
           {isLoading ? (
             <>
               <Spinner />
-              Inscription...
+              Connexion...
             </>
           ) : (
-            "Inscription"
+            "Connexion"
           )}
         </Button>
       </CardFooter>

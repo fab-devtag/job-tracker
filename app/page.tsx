@@ -1,10 +1,10 @@
 "use client";
 
-import { JobOffer } from "./lib/types";
+import { JobOffer } from "../lib/types";
 
 import { useCallback, useEffect, useState } from "react";
 
-import { useLocalStorage } from "./hooks/useLocalStorage";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import { AddJobOfferForm } from "@/components/AddJobOfferForm";
 import { JobOfferCard } from "@/components/JobOfferCard";
 import { Button } from "@/components/ui/button";
