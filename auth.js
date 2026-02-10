@@ -5,6 +5,9 @@ import { loginSchema } from "./lib/validations/auth";
 import { prisma } from "./lib/prisma";
 
 export const { auth, handlers, signIn, signOut, } = NextAuth({
+    session: {
+        strategy: 'jwt'
+    },
     providers: [
         Credentials({
             credentials: {
@@ -37,7 +40,21 @@ export const { auth, handlers, signIn, signOut, } = NextAuth({
                     email: user.email,
                     name: user.name
                 };
-            }
+            },
         })
-    ]
+    ],
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.userId = user.id
+            }
+            return token;
+        },
+        async session(session, token) {
+            if (session.user) {
+                session.user.id = token.userId
+            }
+            return session;
+        }
+    }
 })
