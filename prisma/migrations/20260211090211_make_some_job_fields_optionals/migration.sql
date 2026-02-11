@@ -1,0 +1,14 @@
+-- AlterEnum
+ALTER TYPE "JobStatus" ADD VALUE 'WISHLIST';
+
+-- DropForeignKey
+ALTER TABLE "Job" DROP CONSTRAINT "Job_userId_fkey";
+
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "link" DROP NOT NULL,
+ALTER COLUMN "salary" DROP NOT NULL,
+ALTER COLUMN "localisation" DROP NOT NULL,
+ALTER COLUMN "notes" DROP NOT NULL;
+
+-- AddForeignKey
+ALTER TABLE "Job" ADD CONSTRAINT "Job_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

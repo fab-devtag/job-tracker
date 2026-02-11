@@ -27,14 +27,14 @@ model Job {
   id           String    @id @default(uuid())
   title        String
   company      String
-  link         String
+  link         String?
   status       JobStatus
-  salary       String
-  localisation String
+  salary       String?
+  localisation String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  notes        String
-  user         User      @relation(fields: [userId], references: [id])
+  notes        String?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
 }
 
