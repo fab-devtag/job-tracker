@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 
 export const PATCH = async (
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) => {
-  const { id } = params;
+  const { id } = await params;
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -44,7 +44,7 @@ export const PATCH = async (
 
   if (job.userId !== session.user.id) {
     return NextResponse.json(
-      { success: false, error: "Non authorisé" },
+      { success: false, error: "Non autorisé" },
       { status: 403 },
     );
   }
@@ -60,7 +60,53 @@ export const PATCH = async (
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error update job", error);
+    console.error("Erreur update job", error);
+    return NextResponse.json(
+      { success: false, error: "Erreur serveur" },
+      { status: 500 },
+    );
+  }
+};
+
+export const DELETE = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
+  const { id } = await params;
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { success: false, error: "Utilisateur non authentifié" },
+      { status: 401 },
+    );
+  }
+
+  const job = await prisma.job.findUnique({
+    where: { id: id },
+  });
+
+  if (!job) {
+    return NextResponse.json(
+      { success: false, error: "Le job n'existe pas" },
+      { status: 404 },
+    );
+  }
+
+  if (job.userId !== session.user.id) {
+    return NextResponse.json(
+      { success: false, error: "Non autorisé" },
+      { status: 403 },
+    );
+  }
+
+  try {
+    await prisma.job.delete({
+      where: { id: id },
+    });
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("Erreur delete job");
     return NextResponse.json(
       { success: false, error: "Erreur serveur" },
       { status: 500 },
