@@ -1,0 +1,23 @@
+onMutate: async (variables) => {
+      //On annule les refetch en cours
+      await queryClient.cancelQueries({ queryKey: ["jobs"] });
+
+      //On sauvegarde l'ancien state au cas ou on doit rollback
+      const previousJobs = queryClient.getQueryData<Job[]>(["jobs"]);
+
+      //On va créer le nouveau job (optimistic update)
+      const optimisticJob: Job = {
+        id: crypto.randomUUID(),
+        ...variables,
+        userId: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      queryClient.setQueryData<Job[]>(["jobs"], (old = []) => [
+        ...old,
+        optimisticJob,
+      ]);
+
+      return { previousJobs, optimisticJob };
+    },

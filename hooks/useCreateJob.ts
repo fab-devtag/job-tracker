@@ -42,42 +42,13 @@ export const useCreateJob = () => {
 
   return useMutation({
     mutationFn: createJob,
-    //On pourrait supprimer le onmutate et invalider queries dans onsuccess
-    onMutate: async (variables) => {
-      //On annule les refetch en cours
-      await queryClient.cancelQueries({ queryKey: ["jobs"] });
-
-      //On sauvegarde l'ancien state au cas ou on doit rollback
-      const previousJobs = queryClient.getQueryData<Job[]>(["jobs"]);
-
-      //On va créer le nouveau job (optimistic update)
-      const optimisticJob: Job = {
-        id: crypto.randomUUID(),
-        ...variables,
-        userId: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      queryClient.setQueryData<Job[]>(["jobs"], (old = []) => [
-        ...old,
-        optimisticJob,
-      ]);
-
-      return { previousJobs, optimisticJob };
-    },
+    //On pourrait supprimer le onmutate et invalider queries dans onsuccess (check optimistic update)
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] }); // REFETCH AUTOMATIQUE
     },
     onError: (error, variables, context) => {
       // Rollback en cas d'erreur
-      if (context?.previousJobs) {
-        queryClient.setQueryData<Job[]>(["jobs"], context.previousJobs);
-      }
-    },
-    onSettled: () => {
-      // Refetch pour être sûr d'avoir les bonnes données
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      console.error("Erreur lors de la création du job :", error);
     },
     retry: 3,
   });
