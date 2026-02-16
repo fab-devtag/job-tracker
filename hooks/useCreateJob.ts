@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as z from "zod";
 import { createJobSchema } from "@/lib/validations/job";
 
-type CreateJobInput = z.infer<typeof createJobSchema>;
+type CreateJobInput = z.input<typeof createJobSchema>;
 
 type ApiResponse =
   | {
@@ -27,6 +27,7 @@ const createJob = async (newJob: CreateJobInput): Promise<Job> => {
   const result: ApiResponse = await response.json();
 
   if (!response.ok || !result.success) {
+    console.log(result);
     throw new Error(
       !result.success
         ? result.error
@@ -48,7 +49,7 @@ export const useCreateJob = () => {
     },
     onError: (error, variables, context) => {
       // Rollback en cas d'erreur
-      console.error("Erreur lors de la création du job :", error);
+      console.error("Erreur lors de la création du job :", error.message);
     },
     retry: 3,
   });

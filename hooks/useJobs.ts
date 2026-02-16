@@ -24,10 +24,10 @@ const getJobs = async (): Promise<Job[]> => {
 };
 
 export const useJobs = () => {
-  const { data, isLoading, error } = useQuery<Job[]>({
+  const { data, isLoading, error, refetch } = useQuery<Job[]>({
     queryKey: ["jobs"],
     queryFn: getJobs,
   });
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch };
 };
