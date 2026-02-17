@@ -27,6 +27,7 @@ export const useJobs = () => {
   const { data, isLoading, error, refetch } = useQuery<Job[]>({
     queryKey: ["jobs"],
     queryFn: getJobs,
+    retry: 3,
   });
 
   return { data, isLoading, error, refetch };
