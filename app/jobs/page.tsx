@@ -1,6 +1,7 @@
 "use client";
 import { JobCard } from "@/components/jobs/Card";
 import { CreateJobForm } from "@/components/jobs/CreateJobForm";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useJobs } from "@/hooks/useJobs";
 
@@ -23,16 +24,14 @@ export default function JobsPage() {
   if (!jobs || jobs.length === 0) return <div>Aucun job</div>;
 
   return (
-    <div>
+    <div className="w-full container mx-auto">
       <h1>Liste des jobs</h1>
-      <div className="flex gap-5">
+      <div className="grid grid-cols-4 gap-5">
         {jobs.map((job) => (
           <JobCard key={job.id} job={job} />
         ))}
       </div>
-      <div className="max-w-sm">
-        <CreateJobForm />
-      </div>
+      <CreateJobForm />
     </div>
   );
 }

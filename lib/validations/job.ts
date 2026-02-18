@@ -2,7 +2,9 @@ import * as z from "zod";
 
 export const createJobSchema = z.object({
   title: z.string().min(1, { message: "Le titre du poste est obligatoire" }),
-  company: z.string(),
+  company: z
+    .string()
+    .min(1, { message: "Le nom de la société est obligatoire" }),
   link: z.string().nullable().optional().default(null),
   status: z
     .enum(["WISHLIST", "APPLIED", "INTERVIEW", "OFFER", "REJECTED"])

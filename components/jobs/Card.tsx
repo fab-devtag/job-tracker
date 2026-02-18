@@ -11,6 +11,7 @@ import {
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { DeleteButton } from "./DeleteButton";
 
 interface Props {
   job: Job;
@@ -33,7 +34,7 @@ export const JobCard = ({ job }: Props) => {
       </CardContent>
       <CardFooter>
         <CardAction className="flex justify-between w-full">
-          <Button variant="destructive">Supprimer</Button>
+          <DeleteButton />
           <Button variant="outline">Modifier</Button>
         </CardAction>
       </CardFooter>
