@@ -1,9 +1,8 @@
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { createJobSchema } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
+import { FieldGroup } from "../ui/field";
 import { Button } from "../ui/button";
 import { useCreateJob } from "@/hooks/useCreateJob";
 import {
@@ -16,12 +15,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { FormField } from "./FormField";
+import { useState } from "react";
+
+type CreateJobInput = z.input<typeof createJobSchema>;
 
 export const CreateJobForm = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { mutate, isPending, error } = useCreateJob();
-  const { handleSubmit, control, reset, getValues } = useForm<
-    z.input<typeof createJobSchema>
-  >({
+  const { handleSubmit, reset, control } = useForm<CreateJobInput>({
     resolver: zodResolver(createJobSchema),
     defaultValues: {
       title: "",
@@ -34,13 +36,8 @@ export const CreateJobForm = () => {
     },
   });
 
-  const onSubmit = (data: z.input<typeof createJobSchema>) => {
-    mutate(data);
-    reset();
-  };
-
   const fieldsArray: {
-    name: keyof z.input<typeof createJobSchema>;
+    name: keyof CreateJobInput;
     id: string;
     label: string;
     placeholder: string;
@@ -89,8 +86,22 @@ export const CreateJobForm = () => {
     },
   ];
 
+  const onSubmit = (data: CreateJobInput) => {
+    mutate(data, {
+      onSuccess: () => {
+        reset();
+        setIsOpen(false);
+      },
+    });
+  };
+
+  const handleModal = (value: boolean) => {
+    setIsOpen(value);
+    if (!value) reset();
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={handleModal}>
       <DialogTrigger asChild>
         <Button>Créer un job</Button>
       </DialogTrigger>
@@ -107,29 +118,8 @@ export const CreateJobForm = () => {
           className="bg-card p-5 border-2 rounded-xl"
         >
           <FieldGroup>
-            {fieldsArray.map((element) => (
-              <Controller
-                key={element.id}
-                name={element.name}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={element.id}>
-                      {element.label}
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      value={field.value || ""}
-                      id={element.id}
-                      aria-invalid={fieldState.invalid}
-                      placeholder={element.placeholder}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+            {fieldsArray.map((field) => (
+              <FormField key={field.id} element={field} control={control} />
             ))}
           </FieldGroup>
         </form>
