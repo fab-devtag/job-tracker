@@ -1,9 +1,12 @@
 "use client";
 import { JobCard } from "@/components/jobs/Card";
 import { CreateJobForm } from "@/components/jobs/CreateJobForm";
+import { EditJobForm } from "@/components/jobs/EditJobForm";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useJobs } from "@/hooks/useJobs";
+import { Job } from "@/lib/generated/prisma";
+import { useState } from "react";
 
 export default function JobsPage() {
   const { data: jobs, isLoading, error } = useJobs();
@@ -14,7 +17,7 @@ export default function JobsPage() {
         <h1>Liste des jobs</h1>
         <div className="flex gap-5">
           {Array.from([0, 1, 2, 3]).map((skel) => (
-            <Skeleton key={skel} className="w-full max-w-sm h-50 bg-card" />
+            <Skeleton key={skel} className="w-full max-w-sm h-48 bg-card" />
           ))}
         </div>
       </div>

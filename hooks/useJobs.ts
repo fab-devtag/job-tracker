@@ -19,7 +19,7 @@ const getJobs = async (): Promise<Job[]> => {
         : `${response.status}:${response.statusText}`,
     );
   }
-
+  console.log(result.data);
   return result.data;
 };
 

@@ -18,6 +18,9 @@ export const GET = async () => {
     where: {
       userId: session.user.id,
     },
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
   return NextResponse.json({ success: true, data: jobs }, { status: 200 });

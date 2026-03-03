@@ -5,6 +5,11 @@ import * as z from "zod";
 
 type UpdateJobInput = z.input<typeof updateJobSchema>;
 
+type UpdateJobMutationInput = {
+  id: string;
+  data: UpdateJobInput;
+};
+
 type ApiResponse =
   | {
       success: false;
@@ -12,12 +17,14 @@ type ApiResponse =
     }
   | { success: true; data: Job };
 
-const updateJob = async (updatedJob: UpdateJobInput): Promise<Job> => {
-  const id = "f7bf5487-fdf2-485d-9045-2dcd225e169e";
+const updateJob = async ({
+  id,
+  data,
+}: UpdateJobMutationInput): Promise<Job> => {
   const response = await fetch(`/api/jobs/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedJob),
+    body: JSON.stringify(data),
   });
 
   const result: ApiResponse = await response.json();
